@@ -121,6 +121,12 @@ public class NetworkedClient : MonoBehaviour
 
 }
 
+public static class ClientToServerSignifiers
+{
+    public const int CreateAccountAttempt = 1;
+    public const int LoginAttempt = 2;
+
+}
 
 public static class ServerToClientSignifiers
 {
@@ -132,10 +138,5 @@ public static class ServerToClientSignifiers
 
 }
 
-public static class ClientToServerSignifiers
-{
-    public const int CreateAccountAttempt = 1;
-    public const int LoginAttempt = 2;
 
-}
 
