@@ -17,10 +17,21 @@ public class NetworkedClient : MonoBehaviour
     bool isConnected = false;
     int ourClientID;
 
+    GameObject uiManager; 
+
     // Start is called before the first frame update
     void Start()
     {
-        Connect();
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+
+        foreach (GameObject go in allObjects)
+        {
+            if (go.name == "UIManager")
+                uiManager = go;
+        }
+
+            Connect();
+
     }
 
     // Update is called once per frame
@@ -28,13 +39,13 @@ public class NetworkedClient : MonoBehaviour
     {
 
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            SendMessageToHost(ClientToServerSignifiers.CreateAccountAttempt + "," + "AccountTest" + "," + "PasswordTest");
-        }  else if (Input.GetKeyDown(KeyCode.L))
-        {
-            SendMessageToHost(ClientToServerSignifiers.LoginAttempt + "," + "AccountTest" + "," + "PasswordTest");
-        }
+        //if (Input.GetKeyDown(KeyCode.C))
+        //{
+        //    SendMessageToHost(ClientToServerSignifiers.CreateAccountAttempt + "," + "AccountTest" + "," + "PasswordTest");
+        //}  else if (Input.GetKeyDown(KeyCode.L))
+        //{
+        //    SendMessageToHost(ClientToServerSignifiers.LoginAttempt + "," + "AccountTest" + "," + "PasswordTest");
+        //}
         UpdateNetworkConnection();
     }
 
@@ -111,6 +122,24 @@ public class NetworkedClient : MonoBehaviour
     private void ProcessRecievedMsg(string msg, int id)
     {
         Debug.Log("msg recieved = " + msg + ".  connection id = " + id);
+
+        string[] csv = msg.Split(',');
+
+        int signifier = int.Parse(csv[0]);
+
+        if (signifier == ServerToClientSignifiers.LoginSuccess)
+        {
+            uiManager.GetComponent<UIManager>().ChangeGameState(GameStates.MainMenu);
+        }
+        else if (signifier == ServerToClientSignifiers.GameRoomStarted)
+        {
+            uiManager.GetComponent<UIManager>().ChangeGameState(GameStates.PlayingTicTacToe);
+        }
+        else if (signifier == ServerToClientSignifiers.OpponentPlayed)
+        {
+            Debug.Log("OPPONENT SENT A PLAY");
+        }
+
     }
 
     public bool IsConnected()
@@ -125,6 +154,10 @@ public static class ClientToServerSignifiers
 {
     public const int CreateAccountAttempt = 1;
     public const int LoginAttempt = 2;
+    public const int AddToGameRoomQueue = 3;
+    public const int TicTacToePlay = 4;
+
+
 
 }
 
@@ -135,6 +168,10 @@ public static class ServerToClientSignifiers
 
     public const int CreateAccountFailure = 3;
     public const int LoginFailure = 4;
+
+    public const int GameRoomStarted = 5;
+    public const int OpponentPlayed = 6;
+
 
 }
 
